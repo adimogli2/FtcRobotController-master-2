@@ -31,9 +31,3 @@ dependencies {
 dependencies {
     implementation 'org.openftc:easyopencv:1.6.2'
 }
-
-dependencies {
-    implementation 'org.openftc:openftc-turbo:7.0.0'
-    implementation 'org.openftc:openftc-tfod:7.0.0'
-}
-
