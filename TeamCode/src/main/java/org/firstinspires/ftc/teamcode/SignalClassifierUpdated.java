@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -16,8 +18,17 @@ import org.opencv.imgproc.Imgproc;
 public class SignalClassifierUpdated extends LinearOpMode {
     private OpenCvCamera camera;
 
+    private DcMotor FL0;
+    private DcMotor BL1;
+    private DcMotor BR2;
+    private DcMotor FR3;
+
     @Override
     public void runOpMode() {
+        FL0 = hardwareMap.get(DcMotor.class, "Front_Left");
+        BL1 = hardwareMap.get(DcMotor.class, "Back_Left");
+        BR2 = hardwareMap.get(DcMotor.class, "Back_Right");
+        FR3 = hardwareMap.get(DcMotor.class, "Front_Right");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -28,7 +39,7 @@ public class SignalClassifierUpdated extends LinearOpMode {
 
             @Override
             public void onError(int errorCode) {
-                
+
             }
         });
         camera.setPipeline(new SignalPipeline());
@@ -52,6 +63,15 @@ public class SignalClassifierUpdated extends LinearOpMode {
                 // green signal
                 telemetry.addData("Signal", "Green");
                 telemetry.update();
+                FL0.setPower(0.25);
+                BL1.setPower(0.25);
+                BR2.setPower(0.25);
+                FR3.setPower(0.25);
+            }else{
+                FL0.setPower(0);
+                BL1.setPower(0);
+                BR2.setPower(0);
+                FR3.setPower(0);
             }
             return input;
         }
