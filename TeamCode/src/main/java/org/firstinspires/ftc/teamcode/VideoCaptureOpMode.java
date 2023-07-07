@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.sun.tools.doclint.Env;
+
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
@@ -54,14 +56,23 @@ public class VideoCaptureOpMode extends LinearOpMode {
         });
         camera.setPipeline(new SignalPipeline());
 
-        File videoFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "video.avi");
+        File videoFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "video.avi");
         videoWriter = new VideoWriter(videoFile.getAbsolutePath(), VideoWriter.fourcc('M', 'J', 'P', 'G'), 30, new Size(240, 320), true);
 
-        File dataFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.csv");
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File dataFile = new File(path, "data.csv");
+        path.mkdirs();
         try {
+            telemetry.addData("dataFile", "dataFile: " + dataFile.toString());
+            telemetry.addData("dataDir", "dataDir: " + Environment.DIRECTORY_DOCUMENTS);
+            telemetry.update();
+
             fileWriter = new FileWriter(dataFile);
             fileWriter.write("Timestamp,SteeringAngle\n");
         } catch (IOException e) {
+
+            telemetry.addData("FAIL", "FAIL: " + e.getMessage());
+            telemetry.update();
             e.printStackTrace();
         }
 
