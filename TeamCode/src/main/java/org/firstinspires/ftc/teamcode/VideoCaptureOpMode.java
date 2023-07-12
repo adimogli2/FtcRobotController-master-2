@@ -98,25 +98,25 @@ public class VideoCaptureOpMode extends LinearOpMode {
             Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
             Mat maskRed = new Mat();
             Mat maskGreen = new Mat();
-            Core.inRange(hsv, new Scalar(0, 70, 50), new Scalar(10, 255, 255), maskRed);
-            //Core.inRange(hsv, new Scalar(38, 70, 50), new Scalar(75, 255, 255), maskGreen);
-            if (Core.countNonZero(maskGreen) > 100) {
-                // red signal
-                telemetry.addData("Signal", "Green: " + Core.countNonZero(maskGreen));
-                telemetry.update();
-                /*FL0.setPower(0.25);
-                BL1.setPower(0.25);
-                BR2.setPower(0.25);
-                FR3.setPower(0.25);*/
-            } else {
-                // green signal
-                telemetry.addData("Signal", "Red: " + Core.countNonZero(maskGreen));
-                telemetry.update();
-                /*FL0.setPower(0);
-                BL1.setPower(0);
-                BR2.setPower(0);
-                FR3.setPower(0);*/
-            }
+//            Core.inRange(hsv, new Scalar(0, 70, 50), new Scalar(10, 255, 255), maskRed);
+//            //Core.inRange(hsv, new Scalar(38, 70, 50), new Scalar(75, 255, 255), maskGreen);
+//            if (Core.countNonZero(maskGreen) > 100) {
+//                // red signal
+//                telemetry.addData("Signal", "Green: " + Core.countNonZero(maskGreen));
+//                telemetry.update();
+//                /*FL0.setPower(0.25);
+//                BL1.setPower(0.25);
+//                BR2.setPower(0.25);
+//                FR3.setPower(0.25);*/
+//            } else {
+//                // green signal
+//                telemetry.addData("Signal", "Red: " + Core.countNonZero(maskGreen));
+//                telemetry.update();
+//                /*FL0.setPower(0);
+//                BL1.setPower(0);
+//                BR2.setPower(0);
+//                FR3.setPower(0);*/
+//            }
 
             videoWriter.write(input);
 
