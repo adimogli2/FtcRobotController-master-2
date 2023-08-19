@@ -35,7 +35,7 @@ public class videoRecordingOpMode extends LinearOpMode {
     private VideoCapture videoCapture;
     private VideoWriter videoWriter;
 
-    private static final int  CAMERA_FRAME_WIDTH = 640;
+    private static final int CAMERA_FRAME_WIDTH = 640;
     private static final int CAMERA_FRAME_HEIGHT = 480;
     private static final int CAMERA_FRAME_RATE = 30;
     private static final String VIDEO_FILE_EXTENSION = ".jpg";
@@ -57,14 +57,14 @@ public class videoRecordingOpMode extends LinearOpMode {
                 double hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
                 //double hyp = hypt * -1;
                 //if on y-axis
-                if(tgp_x == 0){
+                if (tgp_x == 0) {
                     FL0.setPower(tgp_y);
                     BL1.setPower(tgp_y);
                     BR2.setPower(tgp_y);
                     FR3.setPower(tgp_y);
                 }
                 //if on x-axis (strafing)
-                else if(tgp_y == 0 ) {
+                else if (tgp_y == 0) {
                     FL0.setPower(tgp_x);
                     BL1.setPower(tgp_x * -1);
                     BR2.setPower(tgp_x);
@@ -79,7 +79,7 @@ public class videoRecordingOpMode extends LinearOpMode {
                 //FR3.setPower(tgp_x * -1);
                 //}
 
-                if(rot_y == 0){
+                if (rot_y == 0) {
                     FL0.setPower(rot_x);
                     BL1.setPower(rot_x);
                     BR2.setPower(rot_x * -1);
@@ -87,21 +87,21 @@ public class videoRecordingOpMode extends LinearOpMode {
                 }
 
                 //if in first quadrant
-                if(tgp_x > 0 && tgp_y > 0 ){
+                if (tgp_x > 0 && tgp_y > 0) {
                     FL0.setPower(hyp);
                     BL1.setPower(0);
                     BR2.setPower(hyp);
                     FR3.setPower(0);
                 }
                 //if in second quadrant
-                else if(tgp_x < 0 && tgp_y > 0 ){
+                else if (tgp_x < 0 && tgp_y > 0) {
                     FL0.setPower(0);
                     BL1.setPower(hyp);
                     BR2.setPower(0);
                     FR3.setPower(hyp);
                 }
                 //if in third quadrant
-                else if(tgp_x < 0 && tgp_y < 0 ){
+                else if (tgp_x < 0 && tgp_y < 0) {
                     FL0.setPower(hyp * -1);
                     BL1.setPower(0);
                     BR2.setPower(hyp * -1);
@@ -109,14 +109,12 @@ public class videoRecordingOpMode extends LinearOpMode {
 
                 }
                 //if in fourth quadrant
-                else if(tgp_x > 0 && tgp_y < 0 ) {
+                else if (tgp_x > 0 && tgp_y < 0) {
                     FL0.setPower(0);
                     BL1.setPower(hyp * -1);
                     BR2.setPower(0);
                     FR3.setPower(hyp * -1);
-                }
-
-                else if(mac1) {
+                } else if (mac1) {
                     FL0.setPower(0.5);
                     BL1.setPower(0.5);
                     BR2.setPower(0.5 * -1);
@@ -204,7 +202,7 @@ public class videoRecordingOpMode extends LinearOpMode {
             int redCount = Core.countNonZero(maskRed);
             int greenCount = Core.countNonZero(maskGreen);
             int yellowCount = Core.countNonZero(maskYellow);
-            /*if (redCount > greenCount && redCount > yellowCount) {
+            if (redCount > greenCount && redCount > yellowCount) {
                 // red signal
                 telemetry.addData("Signal", "Red");
                 telemetry.update();
@@ -227,9 +225,10 @@ public class videoRecordingOpMode extends LinearOpMode {
                 FL0.setPower(0.1);
                 BL1.setPower(0.1);
                 BR2.setPower(0.1);
-                FR3.setPower(0.1);*/
-            //}
-            videoWriter.write(input);
+                FR3.setPower(0.1);
+                //}
+                videoWriter.write(input);
+            }
             return input;
         }
     }
