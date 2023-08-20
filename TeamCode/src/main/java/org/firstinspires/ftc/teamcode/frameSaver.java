@@ -1,42 +1,51 @@
-import android.os.Bundle;
+/*
+package org.firstinspires.ftc.teamcode;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.SurfaceView;
+
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
+import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.android.JavaCameraView;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
-public class MainActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
-    private JavaCameraView mOpenCvCameraView;
-    private Mat mRgba;
+public class frameSaver extends Activity implements CvCameraViewListener2 {
+    private CameraBridgeViewBase cameraView;
     private int frameCount = 0;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_save_frames);
 
-        mOpenCvCameraView = (JavaCameraView) findViewById(R.id.java_camera_view);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setCvCameraViewListener(this);
+        // Set up the camera view
+        cameraView = (JavaCameraView) findViewById(R.id.camera_view);
+        cameraView.setVisibility(SurfaceView.VISIBLE);
+        cameraView.setCvCameraViewListener(this);
     }
 
     @Override
-    public void onCameraViewStarted(int width, int height) {
-        mRgba = new Mat();
-    }
+    public void onCameraViewStarted(int width, int height) {}
 
     @Override
-    public void onCameraViewStopped() {
-        mRgba.release();
-    }
+    public void onCameraViewStopped() {}
 
     @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
+    public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
+        // Get the current frame from the camera
+        Mat frame = inputFrame.rgba();
+
+        // Save the frame to a file
+        String filename = "frame" + frameCount + ".png";
+        Imgcodecs.imwrite(filename, frame);
+
+        // Increment the frame count
         frameCount++;
-        if (frameCount % 30 == 0) {
-            String filename = "frame_" + frameCount + ".png";
-            Imgcodecs.imwrite(filename, mRgba);
-        }
-        return mRgba;
+
+        return frame;
     }
 }
+*/
