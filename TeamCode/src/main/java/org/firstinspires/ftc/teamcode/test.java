@@ -31,6 +31,9 @@ public class test extends LinearOpMode {
     private DcMotor BR2;
     private DcMotor FR3;
 
+    double dir = 0;
+
+
     private OpenCvCamera camera;
 
     private VideoCapture videoCapture = new VideoCapture();
@@ -56,16 +59,16 @@ public class test extends LinearOpMode {
                 boolean mac1 = gamepad1.dpad_right;
 
                 // Update motor powers
-                updateMotorPowers(tgp_x, tgp_y, rot_x, rot_y, mac1);
+                //updateMotorPowers(tgp_x, tgp_y, rot_x, rot_y, mac1);
 
                 // Write frame to the video file
-                writeFrameToVideo();
+                //writeFrameToVideo();
             }
         } catch (Exception e) {
             telemetry.addData("Error", e.getMessage());
             telemetry.update();
         } finally {
-            //stopVideoRecording();
+            stopVideoRecording();
         }
     }
 
@@ -80,7 +83,9 @@ public class test extends LinearOpMode {
 
     private void initializeVideoRecording() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        String fileName = String.format("%f_%f_%f_%f%s", FL0.getPower(), BL1.getPower(), BR2.getPower(), FR3.getPower(), VIDEO_FILE_EXTENSION);
+        //String fileName = String.format("%f_%f_%f_%f%s", FL0.getPower(), BL1.getPower(), BR2.getPower(), FR3.getPower(), VIDEO_FILE_EXTENSION);
+        //String fileName = String.format("%d_%f%s", System.currentTimeMillis()/1000, dir, VIDEO_FILE_EXTENSION);
+        String fileName = String.format("+_%f%s", dir, VIDEO_FILE_EXTENSION);
         File videoFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), fileName);
         //to save image sequence, use a proper filename; set fourcc=0 or fps=0
         videoWriter = new VideoWriter(videoFile.getAbsolutePath(), 0, 0, new Size(240, 320), true);
@@ -122,49 +127,108 @@ public class test extends LinearOpMode {
         videoCapture.release();
         videoWriter.release();
     }
+    private double robotControl(){
+        double tgp_y = 0;
+        double tgp_x = 0;
+        double rot_x = 0;
+        double rot_y = 0;
+        boolean mac1 = false;
 
-    class SignalPipeline extends OpenCvPipeline {
+        tgp_x = gamepad1.left_stick_x;
+        tgp_y = gamepad1.left_stick_y * -1;
+        rot_x = gamepad1.right_stick_x;
+        rot_y = gamepad1.right_stick_y;
+        mac1 = gamepad1.dpad_right;
+
+        double hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
+        //double hyp = hypt * -1;
+        //if on y-axis
+        if(tgp_x == 0){
+            FL0.setPower(tgp_y);
+            BL1.setPower(tgp_y);
+            BR2.setPower(tgp_y);
+            FR3.setPower(tgp_y);
+        }
+        //if on x-axis (strafing)
+        else if(tgp_y == 0 ) {
+            FL0.setPower(tgp_x);
+            BL1.setPower(tgp_x * -1);
+            BR2.setPower(tgp_x);
+            FR3.setPower(tgp_x * -1);
+        }
+
+        //turning right or left
+        // else if(rot_x >= -1 && rot_x <= 1) {
+        //FL0.setPower(tgp_x);
+        //BL1.setPower(tgp_x * -1);
+        //BR2.setPower(tgp_x);
+        //FR3.setPower(tgp_x * -1);
+        //}
+
+        if(rot_y == 0){
+            FL0.setPower(rot_x);
+            BL1.setPower(rot_x);
+            BR2.setPower(rot_x * -1);
+            FR3.setPower(rot_x * -1);
+        }
+
+        //if in first quadrant
+        if(tgp_x > 0 && tgp_y > 0 ){
+            FL0.setPower(hyp);
+            BL1.setPower(0);
+            BR2.setPower(hyp);
+            FR3.setPower(0);
+            dir = Math.atan(tgp_y/tgp_x) * 180/Math.PI;
+            telemetry.addData("Angle", dir);
+            telemetry.update();
+        }
+        //if in second quadrant
+        else if(tgp_x < 0 && tgp_y > 0 ){
+            FL0.setPower(0);
+            BL1.setPower(hyp);
+            BR2.setPower(0);
+            FR3.setPower(hyp);
+            dir = Math.atan(tgp_y/tgp_x) * 180/Math.PI;
+            telemetry.addData("Angle", dir);
+            telemetry.update();
+        }
+        //if in third quadrant
+        else if(tgp_x < 0 && tgp_y < 0 ){
+            FL0.setPower(hyp * -1);
+            BL1.setPower(0);
+            BR2.setPower(hyp * -1);
+            FR3.setPower(0);
+
+        }
+        //if in fourth quadrant
+        else if(tgp_x > 0 && tgp_y < 0 ) {
+            FL0.setPower(0);
+            BL1.setPower(hyp * -1);
+            BR2.setPower(0);
+            FR3.setPower(hyp * -1);
+        }
+
+        else if(mac1) {
+            FL0.setPower(0.5);
+            BL1.setPower(0.5);
+            BR2.setPower(0.5 * -1);
+            FR3.setPower(0.5 * -1);
+            sleep(2000);
+        }
+
+        return dir;
+    }
+
+        class SignalPipeline extends OpenCvPipeline {
         @Override
         public Mat processFrame(Mat input) {
             Mat hsv = new Mat();
             //Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
-            Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
-            Mat maskRed = new Mat();
-            Mat maskGreen = new Mat();
-            Mat maskYellow = new Mat();
-            Core.inRange(hsv, new Scalar(0, 70, 50), new Scalar(10, 255, 255), maskRed);
-            Core.inRange(hsv, new Scalar(38, 70, 50), new Scalar(75, 255, 255), maskGreen);
-            Core.inRange(hsv, new Scalar(20, 100, 100), new Scalar(30, 255, 255), maskYellow);
-            int redCount = Core.countNonZero(maskRed);
-            int greenCount = Core.countNonZero(maskGreen);
-            int yellowCount = Core.countNonZero(maskYellow);
-            if (redCount > greenCount && redCount > yellowCount) {
-                // red signal
-                telemetry.addData("Signal", "Red");
-                telemetry.update();
-                FL0.setPower(0);
-                BL1.setPower(0);
-                BR2.setPower(0);
-                FR3.setPower(0);
-            } else if (greenCount > redCount && greenCount > yellowCount) {
-                // green signal
-                telemetry.addData("Signal", "Green");
-                telemetry.update();
-                FL0.setPower(0.3);
-                BL1.setPower(0.3);
-                BR2.setPower(0.3);
-                FR3.setPower(0.3);
-            } else if (yellowCount > redCount && yellowCount > greenCount) {
-                // yellow signal
-                telemetry.addData("Signal", "Yellow");
-                telemetry.update();
-                FL0.setPower(0.1);
-                BL1.setPower(0.1);
-                BR2.setPower(0.1);
-                FR3.setPower(0.1);
-            }
-            videoWriter.write(input);
-            return input;
+            //Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
+            Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2RGB);
+            robotControl();
+            videoWriter.write(hsv);
+            return hsv;
         }
     }
 }
