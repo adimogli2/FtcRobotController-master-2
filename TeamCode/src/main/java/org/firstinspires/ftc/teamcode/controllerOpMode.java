@@ -57,18 +57,18 @@ public class controllerOpMode extends LinearOpMode {
             //double hyp = hypt * -1;
             //if on y-axis
             if(tgp_x == 0){
-                FL0.setPower(tgp_y);
-                BL1.setPower(tgp_y);
-                BR2.setPower(tgp_y);
-                FR3.setPower(tgp_y);
+                FL0.setPower(0.25);
+                BL1.setPower(0.25);
+                BR2.setPower(0.25);
+                FR3.setPower(0.25);
             }
             //if on x-axis (strafing)
-            else if(tgp_y == 0 ) {
+            /*else if(tgp_y == 0 ) {
                 FL0.setPower(tgp_x);
                 BL1.setPower(tgp_x * -1);
                 BR2.setPower(tgp_x);
                 FR3.setPower(tgp_x * -1);
-            }
+            }*/
 
             //turning right or left
             // else if(rot_x >= -1 && rot_x <= 1) {
@@ -86,21 +86,21 @@ public class controllerOpMode extends LinearOpMode {
             }
 
             //if in first quadrant
-            if(tgp_x > 0 && tgp_y > 0 ){
+            /*if(tgp_x > 0 && tgp_y > 0 ){
                 FL0.setPower(hyp);
                 BL1.setPower(0);
                 BR2.setPower(hyp);
                 FR3.setPower(0);
-            }
+            }*/
             //if in second quadrant
-            else if(tgp_x < 0 && tgp_y > 0 ){
+           /* else if(tgp_x < 0 && tgp_y > 0 ){
                 FL0.setPower(0);
                 BL1.setPower(hyp);
                 BR2.setPower(0);
                 FR3.setPower(hyp);
-            }
+            }*/
             //if in third quadrant
-            else if(tgp_x < 0 && tgp_y < 0 ){
+            /*else if(tgp_x < 0 && tgp_y < 0 ){
                 FL0.setPower(hyp * -1);
                 BL1.setPower(0);
                 BR2.setPower(hyp * -1);
@@ -113,7 +113,7 @@ public class controllerOpMode extends LinearOpMode {
                 BL1.setPower(hyp * -1);
                 BR2.setPower(0);
                 FR3.setPower(hyp * -1);
-            }
+            }*/
 
             else if(mac1 == true) {
                 FL0.setPower(0.5);
