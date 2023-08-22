@@ -35,6 +35,8 @@ public class controllerOpMode extends LinearOpMode {
         double rot_x = 0;
         double rot_y = 0;
         boolean mac1 = false;
+        boolean mac2 = false;
+        boolean mac3 = false;
 
 
         telemetry.addData("Status", "Initialized");
@@ -48,6 +50,8 @@ public class controllerOpMode extends LinearOpMode {
             rot_x = this.gamepad1.right_stick_x;
             rot_y = this.gamepad1.right_stick_y;
             mac1 = this.gamepad1.dpad_right;
+            mac2 = this.gamepad1.dpad_up;
+            mac3 = this.gamepad1.dpad_down;
 
             double hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
             //double hyp = hypt * -1;
@@ -117,6 +121,20 @@ public class controllerOpMode extends LinearOpMode {
                 BR2.setPower(0.5 * -1);
                 FR3.setPower(0.5 * -1);
                 sleep(2000);
+            }
+
+            else if(mac2 == true) {
+                FL0.setPower(0.25);
+                BL1.setPower(0.25);
+                BR2.setPower(0.25);
+                FR3.setPower(0.25);
+            }
+
+            else if(mac2 == true) {
+                FL0.setPower(0);
+                BL1.setPower(0);
+                BR2.setPower(0);
+                FR3.setPower(0);
             }
 
             telemetry.addData("Hypot ", hyp);
