@@ -23,8 +23,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.io.File;
 
-@TeleOp(name="videoRecordingOpMode", group="Iterative Opmode")
-public class videoRecordingOpMode extends LinearOpMode {
+@TeleOp(name="VideoRecordingOpMode", group="Iterative Opmode")
+public class VideoRecordingOpMode extends LinearOpMode {
     private DcMotor FL0;
     private DcMotor BL1;
     private DcMotor BR2;
