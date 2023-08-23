@@ -26,8 +26,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.io.File;
 import java.text.SimpleDateFormat;
 
-@TeleOp(name="test", group="Iterative Opmode")
-public class test extends LinearOpMode {
+@TeleOp(name="RobotImageGenerator", group="Iterative Opmode")
+public class RobotImageGenerator extends LinearOpMode {
     private DcMotor FL0;
     private DcMotor BL1;
     private DcMotor BR2;
@@ -141,92 +141,47 @@ public class test extends LinearOpMode {
         boolean mac1 = false;
         //if going straight dir is 90 degrees
 
+        FL0.setPower(0);
+        BL1.setPower(0);
+        BR2.setPower(0);
+        FR3.setPower(0);
+
         tgp_x = gamepad1.left_stick_x;
         tgp_y = gamepad1.left_stick_y * -1;
         rot_x = gamepad1.right_stick_x;
         rot_y = gamepad1.right_stick_y;
         mac1 = gamepad1.dpad_right;
-        X = tgp_x;
-        Y = tgp_y;
-        ROT_X = rot_x;
-        ROT_Y = rot_y;
+//        X = tgp_x;
+//        Y = tgp_y;
+//        ROT_X = rot_x;
+//        ROT_Y = rot_y;
 
-        hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
-        //double hyp = hypt * -1;
-        //if on y-axis
-        if(tgp_x == 0){
-            FL0.setPower(tgp_y);
-            BL1.setPower(tgp_y);
-            BR2.setPower(tgp_y);
-            FR3.setPower(tgp_y);
+        if(rot_x > 0) {
+            //multiplying by 0.3 to make sure it is the maximum
+            FL0.setPower(rot_x * 0.3);
+            BL1.setPower(rot_x * 0.3);
+            BR2.setPower(rot_x * -0.2);
+            FR3.setPower(rot_x * -0.2);
         }
-        //if on x-axis (strafing)
-        else if(tgp_y == 0 ) {
-            FL0.setPower(tgp_x);
-            BL1.setPower(tgp_x * -1);
-            BR2.setPower(tgp_x);
-            FR3.setPower(tgp_x * -1);
-            dir = 90;
+        else if (rot_x < 0){
+            FL0.setPower(rot_x * 0.2);
+            BL1.setPower(rot_x * 0.2);
+            BR2.setPower(rot_x * -0.3);
+            FR3.setPower(rot_x * -0.3);
         }
-        //turning right or left
-        // else if(rot_x >= -1 && rot_x <= 1) {
-        //FL0.setPower(tgp_x);
-        //BL1.setPower(tgp_x * -1);
-        //BR2.setPower(tgp_x);
-        //FR3.setPower(tgp_x * -1);
-        //}
-        if(rot_y == 0){
-            FL0.setPower(rot_x);
-            BL1.setPower(rot_x);
-            BR2.setPower(rot_x * -1);
-            FR3.setPower(rot_x * -1);
+        else if(tgp_x == 0 && tgp_y > 0){
+            FL0.setPower(0.25);
+            BL1.setPower(0.25);
+            BR2.setPower(0.25);
+            FR3.setPower(0.25);
         }
-        //if in first quadrant
-        if(tgp_x > 0 && tgp_y > 0 ){
-            //hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
-            FL0.setPower(hyp);
-            BL1.setPower(0);
-            BR2.setPower(hyp);
-            FR3.setPower(0);
-            dir = Math.atan(tgp_y/tgp_x) * 180/Math.PI;
-            telemetry.addData("Angle", dir);
-            telemetry.update();
+        else if(tgp_x == 0 && tgp_y < 0){
+            FL0.setPower(0.25 * -1);
+            BL1.setPower(0.25 * -1);
+            BR2.setPower(0.25 * -1);
+            FR3.setPower(0.25 * -1);
         }
-        //if in second quadrant
-        else if(tgp_x < 0 && tgp_y > 0 ){
-            //hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
-            FL0.setPower(0);
-            BL1.setPower(hyp);
-            BR2.setPower(0);
-            FR3.setPower(hyp);
-            dir = Math.atan(tgp_y/tgp_x) * 180/Math.PI;
-            telemetry.addData("Angle", dir);
-            telemetry.update();
-        }
-        //if in third quadrant
-        else if(tgp_x < 0 && tgp_y < 0 ){
-            //hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
-            FL0.setPower(hyp * -1);
-            BL1.setPower(0);
-            BR2.setPower(hyp * -1);
-            FR3.setPower(0);
-        }
-        //if in fourth quadrant
-        else if(tgp_x > 0 && tgp_y < 0 ) {
-            //hyp = Math.sqrt(Math.pow(tgp_x, 2) + Math.pow(tgp_y, 2));
-            FL0.setPower(0);
-            BL1.setPower(hyp * -1);
-            BR2.setPower(0);
-            FR3.setPower(hyp * -1);
-        }
-        else if(mac1) {
-            FL0.setPower(0.5);
-            BL1.setPower(0.5);
-            BR2.setPower(0.5 * -1);
-            FR3.setPower(0.5 * -1);
-            sleep(2000);
-        }
-        return dir;
+        return rot_x;
     }
     class SignalPipeline extends OpenCvPipeline {
         @Override
@@ -235,13 +190,14 @@ public class test extends LinearOpMode {
             //Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
             //Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
             Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2RGB);
-            robotControl();
-            String timeStamp = new SimpleDateFormat("MMddHHmmss").format(System.currentTimeMillis());
+            double rot = robotControl();
+            String timeStamp = new SimpleDateFormat("yy.MMddHHmmss.SSS").format(System.currentTimeMillis());
             File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Camera/");
             if (!storageDir.exists())
                 storageDir.mkdirs();
-            String fileName = String.format("%s_%f_%f_%f%s", timeStamp, dir, hyp, ROT_X, VIDEO_FILE_EXTENSION);
-//            Log.d("ROT_X", Double.toString(ROT_X));
+            //String fileName = String.format("%s_%f_%f_%f%s", timeStamp, dir, hyp, ROT_X, VIDEO_FILE_EXTENSION);
+            String fileName = String.format("%s_%.3f%s", timeStamp, rot, VIDEO_FILE_EXTENSION);
+            Log.d("ROT_X", Double.toString(rot));
 //            Log.d("ROT_Y", Double.toString(ROT_Y));
 //            Log.d("DIR", Double.toString(dir));
 //            Log.d("HYP", Double.toString(hyp));
