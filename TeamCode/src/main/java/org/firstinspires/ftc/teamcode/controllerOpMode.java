@@ -74,13 +74,13 @@ public class controllerOpMode extends LinearOpMode {
                 BR2.setPower(rot_x * -0.3);
                 FR3.setPower(rot_x * -0.3);
             }
-            else if(tgp_x == 0 && tgp_y > 0){
+            else if(tgp_y > 0){
                 FL0.setPower(0.25);
                 BL1.setPower(0.25);
                 BR2.setPower(0.25);
                 FR3.setPower(0.25);
             }
-            else if(tgp_x == 0 && tgp_y < 0){
+            else if(tgp_y < 0){
                 FL0.setPower(0.25 * -1);
                 BL1.setPower(0.25 * -1);
                 BR2.setPower(0.25 * -1);

@@ -169,13 +169,13 @@ public class RobotImageGenerator extends LinearOpMode {
             BR2.setPower(rot_x * -0.3);
             FR3.setPower(rot_x * -0.3);
         }
-        else if(tgp_x == 0 && tgp_y > 0){
+        else if(tgp_y > 0){
             FL0.setPower(0.25);
             BL1.setPower(0.25);
             BR2.setPower(0.25);
             FR3.setPower(0.25);
         }
-        else if(tgp_x == 0 && tgp_y < 0){
+        else if(tgp_y < 0){
             FL0.setPower(0.25 * -1);
             BL1.setPower(0.25 * -1);
             BR2.setPower(0.25 * -1);
@@ -191,12 +191,21 @@ public class RobotImageGenerator extends LinearOpMode {
             //Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
             Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2RGB);
             double rot = robotControl();
+            //convert to steering angle, assuming 90 is straight ahead
+            long deg = 90;
+            if(rot>0){
+                deg = Math.round((1.0-rot)*90);
+            }else if(rot<0){
+                deg = 180 - Math.round((1.0-(-1*rot))*90);
+            }
             String timeStamp = new SimpleDateFormat("yy.MMddHHmmss.SSS").format(System.currentTimeMillis());
-            File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Camera/");
+            //File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Camera/");
+            File sdCard = Environment.getExternalStorageDirectory();
+            File storageDir = new File (sdCard.getAbsolutePath() + "/Camera/");
             if (!storageDir.exists())
                 storageDir.mkdirs();
             //String fileName = String.format("%s_%f_%f_%f%s", timeStamp, dir, hyp, ROT_X, VIDEO_FILE_EXTENSION);
-            String fileName = String.format("%s_%.3f%s", timeStamp, rot, VIDEO_FILE_EXTENSION);
+            String fileName = String.format("%s_%03d%s", timeStamp, deg, VIDEO_FILE_EXTENSION);
             Log.d("ROT_X", Double.toString(rot));
 //            Log.d("ROT_Y", Double.toString(ROT_Y));
 //            Log.d("DIR", Double.toString(dir));
@@ -208,6 +217,7 @@ public class RobotImageGenerator extends LinearOpMode {
             File videoFile = new File(storageDir, fileName);
             //to save image sequence, use a proper filename; set fourcc=0 or fps=0
             videoWriter = new VideoWriter(videoFile.getAbsolutePath(), 0, 0, new Size(240, 320), true);
+            Log.d("videoFile", videoFile.toString());
             videoWriter.write(hsv);
             return hsv;
         }
