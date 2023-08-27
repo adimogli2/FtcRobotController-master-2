@@ -11,10 +11,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 //import org.opencv.core.Core;
+import org.datavec.image.loader.AndroidNativeImageLoader;
+import org.datavec.image.loader.Java2DNativeImageLoader;
+import org.deeplearning4j.util.ModelSerializer;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 //import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
@@ -23,12 +27,19 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.nd4j.linalg.api.ndarray.INDArray;
+//import org.nd4j.linalg.factory.Nd4j;
+//import org.datavec.image.loader.NativeImageLoader;
+import org.datavec.image.loader.LocalImageLoader;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Native;
 import java.text.SimpleDateFormat;
 
-@Autonomous(name="selfDriving", group="Iterative Opmode")
+@TeleOp(name="selfDriving", group="Iterative Opmode")
 public class selfDriving extends LinearOpMode {
     private DcMotor FL0;
     private DcMotor BL1;
@@ -41,6 +52,8 @@ public class selfDriving extends LinearOpMode {
     double Y = 0;
     double ROT_X = 0;
     double ROT_Y = 0;
+    int imageCount = 0;
+    MultiLayerNetwork model = null;
 
     private OpenCvCamera camera;
 
@@ -56,21 +69,12 @@ public class selfDriving extends LinearOpMode {
     public void runOpMode() {
         try {
             initializeHardware();
+            sleep(5000);
             initializeVideoRecording();
             waitForStart();
 
             while (opModeIsActive()) {
-//                double tgp_x = gamepad1.left_stick_x;
-//                double tgp_y = gamepad1.left_stick_y * -1;
-//                double rot_x = gamepad1.right_stick_x;
-//                double rot_y = gamepad1.right_stick_y;
-//                boolean mac1 = gamepad1.dpad_right;
 
-                // Update motor powers
-                //updateMotorPowers(tgp_x, tgp_y, rot_x, rot_y, mac1);
-
-                // Write frame to the video file
-                //writeFrameToVideo();
             }
         } catch (Exception e) {
             telemetry.addData("Error", e.getMessage());
@@ -100,6 +104,15 @@ public class selfDriving extends LinearOpMode {
 //        //File videoFile = new File(storageDir, fileName);
 //        //to save image sequence, use a proper filename; set fourcc=0 or fps=0
 //        videoWriter = new VideoWriter(videoFile.getAbsolutePath(), 0, 0, new Size(240, 320), true);
+
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/Download/");
+        String modelPath = storageDir + "lane_navigation_final.h5"; // Path to the
+        Log.d("model path", modelPath);
+        try {
+            model = ModelSerializer.restoreMultiLayerNetwork(modelPath);
+        } catch(Exception e){
+            Log.d("Model Error", e.getMessage());
+        }
         camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -135,24 +148,28 @@ public class selfDriving extends LinearOpMode {
         videoCapture.release();
         videoWriter.release();
     }
-    private double robotControl(){
+
+    private double robotControl(double rot_x){
         double tgp_y = 0;
         double tgp_x = 0;
-        double rot_x = 0;
+        //double rot_x = 0;
         double rot_y = 0;
         boolean mac1 = false;
         //if going straight dir is 90 degrees
-
+        //if rot_x = 0
+        if(rot_x == 0){
+            tgp_y = 0.5;
+        }
         FL0.setPower(0);
         BL1.setPower(0);
         BR2.setPower(0);
         FR3.setPower(0);
 
-        tgp_x = gamepad1.left_stick_x;
-        tgp_y = gamepad1.left_stick_y * -1;
-        rot_x = gamepad1.right_stick_x;
-        rot_y = gamepad1.right_stick_y;
-        mac1 = gamepad1.dpad_right;
+//        tgp_x = gamepad1.left_stick_x;
+//        tgp_y = gamepad1.left_stick_y * -1;
+//        rot_x = gamepad1.right_stick_x;
+//        rot_y = gamepad1.right_stick_y;
+//        mac1 = gamepad1.dpad_right;
 //        X = tgp_x;
 //        Y = tgp_y;
 //        ROT_X = rot_x;
@@ -188,7 +205,7 @@ public class selfDriving extends LinearOpMode {
     class SignalPipeline extends OpenCvPipeline {
         @Override
         public Mat processFrame(Mat input) {
-            Mat hsv = new Mat();
+            org.opencv.core.Mat hsv = new Mat();
             // Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
             // Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
             Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2RGB);
@@ -197,26 +214,49 @@ public class selfDriving extends LinearOpMode {
             Core.transpose(hsv, hsv);
             Core.flip(hsv, hsv, 0);
 
-            double rot = robotControl();
+            //add model code here
+            int deg = 90;
+            try {
+                System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+                //Mat imgMat = Imgcodecs.imread("C:\\Pictures\\image.jpg");
+                //INDArray image = loader.asMatrix(imgMat);
+                LocalImageLoader nil = new LocalImageLoader();
+
+                INDArray image = nil.asMatrix(hsv);
+                INDArray strng_angle = model.output(image);
+                deg = strng_angle.getInt(0);
+                Log.d("steering angle", Integer.toString(deg));
+            }catch(Exception e){
+                Log.d("Model Error", e.getMessage());
+            }
+            double rot = 0;
+            if (deg == 90) {
+                rot = 0;
+            } else if (deg < 90) {
+                rot = 1.0 - (deg / 90.0);
+            } else {
+                rot = -1 * (1.0 - ((180 - deg) / 90.0));
+            }
+            Log.d("rot_x", Double.toString(rot));
+            robotControl(rot);
             // ... (rest of your existing code)
+            if(imageCount % 500 == 0) {
+                imageCount++;
+                String timeStamp = new SimpleDateFormat("yy.MMddHHmmss.SSS").format(System.currentTimeMillis());
+                File sdCard = Environment.getExternalStorageDirectory();
+                File storageDir = new File(sdCard.getAbsolutePath() + "/Camera/");
+                if (!storageDir.exists())
+                    storageDir.mkdirs();
 
-            String timeStamp = new SimpleDateFormat("yy.MMddHHmmss.SSS").format(System.currentTimeMillis());
-            File sdCard = Environment.getExternalStorageDirectory();
-            File storageDir = new File (sdCard.getAbsolutePath() + "/Camera/");
-            if (!storageDir.exists())
-                storageDir.mkdirs();
+                String fileName = String.format("%s_%03d%s", timeStamp, deg, VIDEO_FILE_EXTENSION);
+                Log.d("ROT_X", Double.toString(rot));
+                Log.d("fileName", fileName);
 
-            long deg = 90;  // The rotation degree is now set to the default 90
-
-            String fileName = String.format("%s_%03d%s", timeStamp, deg, VIDEO_FILE_EXTENSION);
-            Log.d("ROT_X", Double.toString(rot));
-            Log.d("fileName", fileName);
-
-            File videoFile = new File(storageDir, fileName);
-            videoWriter = new VideoWriter(videoFile.getAbsolutePath(), 0, 0, new Size(240, 320), true);
-            Log.d("videoFile", videoFile.toString());
-            videoWriter.write(hsv);
-
+                File videoFile = new File(storageDir, fileName);
+                videoWriter = new VideoWriter(videoFile.getAbsolutePath(), 0, 0, new Size(240, 320), true);
+                Log.d("videoFile", videoFile.toString());
+                videoWriter.write(hsv);
+            }
             return hsv;
         }
 
