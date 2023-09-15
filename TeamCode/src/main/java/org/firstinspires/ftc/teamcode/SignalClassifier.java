@@ -14,6 +14,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+
 @TeleOp(name = "Signal Classifier")
 public class SignalClassifier extends LinearOpMode {
     private OpenCvCamera camera;

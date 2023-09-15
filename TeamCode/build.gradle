@@ -17,9 +17,49 @@ apply from: '../build.dependencies.gradle'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
+    buildFeatures {
+        mlModelBinding true
+    }
 
     packagingOptions {
         jniLibs.useLegacyPackaging true
+        exclude("META-INF/native-image/ios-x86_64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/linux-x86_64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/windows-x86/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/android-x86_64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/android-x86/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/ios-arm64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/windows-x86_64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/windows-x86_64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/android-arm/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/macosx-arm64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/linux-ppc64le/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/linux-x86_64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/linux-arm64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/android-arm64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/android-arm/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/ios-x86_64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/android-arm64/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/windows-x86/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/macosx-x86_64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/linux-x86/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/ios-arm64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/linux-armhf/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/macosx-arm64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/linux-x86/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/android-x86/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/linux-armhf/jnijavacpp/jni-config.json")
+        exclude("META-INF/native-image/linux-ppc64le/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/android-x86_64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/reflect-config.json")
+        exclude("META-INF/native-image/linux-arm64/jnijavacpp/reflect-config.json")
+        exclude("META-INF/native-image/macosx-x86_64/jnijavacpp/jni-config.json")
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.openftc:opencv-repackaged-bundled-dylibs:4.5.3-C'
     }
 }
 
@@ -28,6 +68,11 @@ dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 }
 
+
 dependencies {
-    implementation 'org.openftc:easyopencv:1.6.2'
+
+    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
+    implementation ('org.openftc:easyopencv:1.6.2')
 }
+
+

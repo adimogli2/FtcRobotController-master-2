@@ -169,7 +169,7 @@ public class RobotImageGenerator extends LinearOpMode {
             BR2.setPower(rot_x * -0.3);
             FR3.setPower(rot_x * -0.3);
         }
-        else if(tgp_y > 0){
+        if(tgp_y > 0){
             FL0.setPower(0.25);
             BL1.setPower(0.25);
             BR2.setPower(0.25);
